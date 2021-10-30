@@ -1,10 +1,3 @@
-/*
-  Serial-WR
-  Output hello to Serial
-  Read input from Serial. If there is a 'E' detected, flip the LED
-  yluo
-  
-*/
 #include <Wire.h>
 // Arduino pin numbers
 const int joyButtonPin = 2; // digital pin connected to switch output
