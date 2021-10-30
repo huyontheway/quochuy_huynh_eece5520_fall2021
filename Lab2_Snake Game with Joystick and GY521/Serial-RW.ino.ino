@@ -11,23 +11,23 @@ const int joyButtonPin = 2; // digital pin connected to switch output
 const int  buttonPin = 3;    // pin that the pushbutton is connected to
 const int buzzer = 4;       // pin that buzzer connected to
 
-const int X_pin = 0; // analog pin connected to X output
-const int Y_pin = 1; // analog pin connected to Y output
+const int X_pin = 0; // analog pin connected to X output of the joystick
+const int Y_pin = 1; // analog pin connected to Y output of the joystick
 
-int x_axis = 0;
-int y_axis = 0;
+int x_axis = 0; // integer variable to hold value of x axis from the joystick
+int y_axis = 0; // integer variable to hold value of y axis from the joystick
 
 bool joyButtonCondition = false;       // Initialize a bool variable to store the condition of the joy button
 int joyButtonState = 0;            // current state of the joy button
 
-bool buttonCondition = false;       // Initialize a bool variable to store the condition of the joy button
-int buttonState = 0;            // current state of the joy button
+bool buttonCondition = false;       // Initialize a bool variable to store the condition of the push button
+int buttonState = 0;            // current state of the push button
 
 int incomingByte = 0;
 
 #include<Wire.h>
 const int MPU_addr1 = 0x68;
-float xa, ya, za, roll, pitch;
+float xa, ya, za, roll, pitch; // variables to hold data read from the GY521
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -35,7 +35,7 @@ void setup() {
   digitalWrite(joyButtonPin, HIGH);
 
   pinMode(buzzer, OUTPUT);      // Set buzzer - pin 4 as an output
-  // initialize the button pin as a input:
+  // initialize the push button pin as a input:
   pinMode(buttonPin, INPUT);
   
   Serial.begin(9600);
@@ -61,7 +61,7 @@ void CheckForJoyStick(){
   
   if (joyButtonState == LOW || joyButtonCondition == true){             // If it is currently pressed and data pin is high
     joyButtonCondition = true;             // Set joyButtonCondition to true
-    buttonCondition = false;
+    buttonCondition = false;               // Set buttonCondition to true
     
     x_axis = analogRead(X_pin);
     y_axis = analogRead(Y_pin);
@@ -110,11 +110,11 @@ void RecordRollPitchAngle(){
   Wire.requestFrom(MPU_addr1, 6, true); //get six bytes accelerometer data
   int t = Wire.read();
   
-  xa = (t << 8) | Wire.read();
+  xa = (t << 8) | Wire.read();  // acceleration in x axis
   t = Wire.read();
-  ya = (t << 8) | Wire.read();
+  ya = (t << 8) | Wire.read();  // acceleration in y axis
   t = Wire.read();
-  za = (t << 8) | Wire.read();
+  za = (t << 8) | Wire.read(); // acceleration in z axis
 // formula from https://wiki.dfrobot.com/How_to_Use_a_Three-Axis_Accelerometer_for_Tilt_Sensing
   roll = atan2(ya , za) * 180.0 / PI;      //rotation with respect to xaxis
   pitch = atan2(-xa , sqrt(ya * ya + za * za)) * 180.0 / PI; //rotation with respext to y axis
@@ -124,9 +124,9 @@ void ControlSnakeGyro(){
   RecordRollPitchAngle();
   buttonState = digitalRead(buttonPin);  // Read data from button pin to see whether it's currently pressed
   
-  if (buttonState == HIGH || buttonCondition == true){             // If it is currently pressed and data pin is high
+  if (buttonState == HIGH || buttonCondition == true){             // If it is currently pressed
     buttonCondition = true;             // Set buttonCondition to true
-    joyButtonCondition = false;
+    joyButtonCondition = false;         // Set joyButtonCondition to true
     
     if (roll >= 30){
       Serial.println("left");
@@ -150,7 +150,7 @@ void ControlSnakeGyro(){
 }
 
 void DetectShaking(){
-  if (buttonState == HIGH || buttonCondition == true){             // If it is currently pressed and data pin is high
+  if (buttonState == HIGH || buttonCondition == true){             // If it is currently pressed
     buttonCondition = true;             // Set buttonCondition to true
     joyButtonCondition = false;
     
